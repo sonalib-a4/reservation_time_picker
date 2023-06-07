@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+import { TimePicker } from "@mui/x-date-pickers";
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TextField, Grid, Button } from '@mui/material';
 
 const MeetingForm = ({ onSubmit }) => {
   const [title, setTitle] = useState('');
@@ -6,7 +12,7 @@ const MeetingForm = ({ onSubmit }) => {
   const [endTime, setEndTime] = useState('');
   const [duration, setDuration] = useState('');
   const [maxCapacity, setMaxCapacity] = useState('');
-  const [minCapacity, setMinCapacity] = useState('');
+  const [minCapacity, setMinCapacity] = useState('1');
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -21,33 +27,71 @@ const MeetingForm = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Title:</label>
-        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-      </div>
-      <div>
-        <label>Availability Start Time:</label>
-        <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
-      </div>
-      <div>
-        <label>Availability End Time:</label>
-        <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
-      </div>
-      <div>
-        <label>Meeting Duration (in minutes):</label>
-        <input type="number" value={duration} onChange={(e) => setDuration(e.target.value)} required />
-      </div>
-      <div>
-        <label>Max Capacity:</label>
-        <input type="number" value={maxCapacity} onChange={(e) => setMaxCapacity(e.target.value)} required />
-      </div>
-      <div>
-        <label>Min Capacity:</label>
-        <input type="number" value={minCapacity} onChange={(e) => setMinCapacity(e.target.value)} required />
-      </div>
-      <button type="submit">Create Meeting</button>
-    </form>
+    <Grid
+          container
+          spacing={3}
+          style={{ paddingTop: "20px" }}
+          justifyContent="center"
+        >
+      <form onSubmit={handleSubmit}>
+        <Grid container>
+          <Grid item md={6}>
+          <TextField
+            label="Title"
+            type="text"
+            variant="outlined"
+          /></Grid>
+          <Grid item md={6}>
+            <TextField
+              label="Duration(in minutes)"
+              type="number"
+              variant="outlined"
+            /></Grid>
+          </Grid>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['TimePicker', 'TimePicker']}>
+            <Grid container>
+            <Grid item md={6}>
+              <TimePicker
+                label="Start Time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+              </Grid>
+              <Grid item md={6}>
+              <TimePicker
+                label="End Time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              /></Grid>
+            </Grid>
+            </DemoContainer>
+          </LocalizationProvider>
+          <Grid container>
+          <Grid item md={6}>
+            <TextField
+              label="Max Capacity"
+              type="number"
+              variant="outlined"
+              value={maxCapacity}
+              onChange={(e) => setMaxCapacity(e.target.value)}
+            />
+          </Grid>
+          <Grid item md={6}>
+          <TextField
+            label="Min Capacity"
+            type="number"
+            variant="outlined"
+            value={minCapacity}
+            onChange={(e) => setMinCapacity(e.target.value)}
+          /></Grid>
+          </Grid>
+          <Grid item md={6}>
+            <Button variant="contained" type="submit">Create Meeting</Button>
+          </Grid>
+        
+      </form>
+    </Grid>
   );
 };
 
