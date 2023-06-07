@@ -8,20 +8,82 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { BrowserStorageService } from "./services/browser_storage_service";
+import { useState } from 'react';
+import * as yup from "yup";
+import { useForm , SubmitHandler} from 'react-hook-form';
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom";
 
+
+type Inputs = {
+    username: string;
+    password: string;
+  };
+  
+  const schema = yup.object().shape({
+    username: yup.string(),
+    password: yup.string(),
+  });
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
+function mimicBackendSignInAPI(username: string, password: string) {
+    let jwt: string = "";
+    console.log("up", username, password);
+    if (username === "admin" && password === "admin") {
+      return {
+        userDetails: { username, role: "admin" },
+        statusCode: 200,
+      };
+    } else if (username === "user1" && password === "user1") {
+      return {
+        userDetails: { username, role: "customer" },
+        statusCode: 200,
+      };
+    } else if (username === "user1" && password === "user1") {
+        return {
+        userDetails: { username, role: "customer" },
+        statusCode: 200,
+        };
+    } else if (username === "user2" && password === "user2") {
+        return {
+        userDetails: { username, role: "customer" },
+        statusCode: 200,
+        };
+    } else {
+      return {
+        auth_token: jwt,
+        userDetails: { username, role: "admin" },
+        statusCode: 401,
+      };
+    }
+  }
+
+
 export default function Login() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    const navigate = useNavigate();
+
+    const [loginIssues, setLoginIssues] = useState<any[]>([]);
+    const { register, handleSubmit, reset } = useForm<Inputs>({
+        mode: "onChange",
+        resolver: yupResolver(schema),
     });
-  };
+
+    const onSubmit: SubmitHandler<Inputs> = (data) => {
+        const authDetails = mimicBackendSignInAPI(data.username, data.password);
+        if (authDetails.statusCode === 200 ) {
+            BrowserStorageService.put(authDetails.userDetails?.username, authDetails.userDetails?.role);
+            reset();
+            navigate("/sonali");
+        } else if (authDetails.statusCode === 401) {
+            setLoginIssues([
+            ...loginIssues,
+            { statusCode: authDetails.statusCode || 401 },
+            ]);
+        }
+    };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -41,26 +103,25 @@ export default function Login() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <TextField
               margin="normal"
               required
               fullWidth
               id="username"
               label="Username"
-              name="username"
               autoComplete="username"
+              {...register("username")}
               autoFocus
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              name="password"
               label="Password"
               type="password"
               id="password"
-              autoComplete="current-password"
+              {...register("password")}
             />
             <Button
               type="submit"
@@ -70,7 +131,7 @@ export default function Login() {
             >
               Sign In
             </Button>
-          </Box>
+          </form>
         </Box>
       </Container>
     </ThemeProvider>
