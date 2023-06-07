@@ -36,8 +36,10 @@ const Sidebar = () => {
       <IconButton
         sx={{
           color: "black",
-          alignItems: "start",
-          justifyContent: "start",
+          position: "absolute",
+          left: 0,
+          marginLeft: "2%",
+          margintop: "-10%",
         }}
         size="large"
         edge="start"
@@ -59,7 +61,7 @@ const Sidebar = () => {
           component="button"
           onClick={() => routeChange("slot")}
         >
-          Create Slot
+          Create Slots
         </Button>
         <Button
           sx={{ marginLeft: "9%", marginRight: "9%", marginTop: "5%" }}

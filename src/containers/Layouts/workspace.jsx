@@ -144,7 +144,7 @@ const MeetingForm = ({ onSubmit }) => {
             </Grid>
             <Grid item md={6} sx={{ marginTop: "2%", paddingBottom: "2%" }}>
               <Button variant="contained" type="submit">
-                Create Meeting
+                Create Slots
               </Button>
             </Grid>
           </Grid>
