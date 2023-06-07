@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { TimePicker } from "@mui/x-date-pickers";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { TextField, Grid, Button } from "@mui/material";
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TextField, Grid, Button, Paper, Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+
+
 const MeetingForm = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -27,13 +30,6 @@ const MeetingForm = ({ onSubmit }) => {
       minCapacity,
       date,
     });
-    console.log("date:", date);
-    console.log("title:", title);
-    console.log("startTime:", startTime);
-    console.log("endTime:", endTime);
-    console.log("duration:", duration);
-    console.log("maxCapacity:", maxCapacity);
-    console.log("minCapacity:", minCapacity);
   };
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -59,7 +55,7 @@ const MeetingForm = ({ onSubmit }) => {
       justifyContent="center"
     >
       <form onSubmit={handleSubmit}>
-        <Grid container>
+        <Grid container spacing={2}> 
           <Grid item md={6}>
             <Calendar
               onChange={(newValue) => {
@@ -132,15 +128,6 @@ const MeetingForm = ({ onSubmit }) => {
                   onChange={(e) => setMaxCapacity(e.target.value)}
                 />
               </Grid>
-              <Grid item md={6} sx={{ marginRight: "1%", marginTop: "2%" }}>
-                <TextField
-                  label="Min Capacity"
-                  type="number"
-                  variant="outlined"
-                  value={minCapacity}
-                  onChange={(e) => setMinCapacity(e.target.value)}
-                />
-              </Grid>
             </Grid>
             <Grid item md={6} sx={{ marginTop: "2%", paddingBottom: "2%" }}>
               <Button variant="contained" type="submit">
@@ -154,29 +141,42 @@ const MeetingForm = ({ onSubmit }) => {
   );
 };
 
+
+
 const Timeslot = ({ timeslot, onBook }) => {
   const { startTime, endTime, capacity, booked } = timeslot;
-
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: booked ? '#8cdd8c' : '#e91e63',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: 'white',
+    cursor: booked ?  'auto' : 'pointer' 
+  }));
   return (
-    <div className={`timeslot ${booked ? "booked" : ""}`} onClick={onBook}>
-      <span>{startTime}</span> - <span>{endTime}</span>
-      <span className="capacity">Capacity: {capacity}</span>
-      {booked && <span className="status">Booked</span>}
-    </div>
+    <Grid item xs={2} className={`timeslot ${booked ? 'booked' : ''}`} onClick={onBook}>
+      <Item disabled={booked ? true : false }><span>{startTime}</span> - <span>{endTime}</span>
+            <span>Capacity: {capacity} - </span>
+      </Item>
+    </Grid>
   );
 };
 
+
+
 const TimeslotList = ({ timeslots, onBook }) => {
   return (
-    <div className="timeslot-list">
-      {timeslots.map((timeslot) => (
-        <Timeslot
-          key={timeslot.startTime}
-          timeslot={timeslot}
-          onBook={() => onBook(timeslot)}
-        />
-      ))}
-    </div>
+    <Box sx={{ flexGrow: 1 }}>
+      <Grid container spacing={2} className='timeslot-list'>
+        {timeslots.map((timeslot) => (
+          <Timeslot
+            key={timeslot.startTime}
+            timeslot={timeslot}
+            onBook={() => onBook(timeslot)}
+          />
+        ))}
+      </Grid>
+    </Box>
   );
 };
 
@@ -187,8 +187,8 @@ export function Workspace() {
   const handleMeetingSubmit = (meeting) => {
     const { startTime, endTime, duration, maxCapacity, minCapacity } = meeting;
 
-    const startTimeObj = new Date(`2000-01-01T${startTime}`);
-    const endTimeObj = new Date(`2000-01-01T${endTime}`);
+    const startTimeObj = new Date(`${startTime}`);
+    const endTimeObj = new Date(`${endTime}`);
     const durationInMinutes = parseInt(duration);
 
     const generatedTimeslots = [];
@@ -209,6 +209,7 @@ export function Workspace() {
         endTime: endTimeString,
         capacity: maxCapacity,
         booked: false,
+        bookedCount: 0
       };
 
       generatedTimeslots.push(timeslot);
@@ -219,19 +220,18 @@ export function Workspace() {
   };
 
   const handleTimeslotBook = (selectedTimeslot) => {
+    selectedTimeslot.bookedCount += 1
+    console.log("selectedTimeslot==", selectedTimeslot)
     const updatedTimeslots = timeslots.map((timeslot) => {
-      if (
-        timeslot.startTime === selectedTimeslot.startTime &&
-        timeslot.endTime === selectedTimeslot.endTime
-      ) {
+      if (timeslot.startTime === selectedTimeslot.startTime && timeslot.endTime === selectedTimeslot.endTime && parseInt(timeslot.capacity) === selectedTimeslot.bookedCount) {
         return {
           ...timeslot,
           booked: true,
         };
       }
+
       return timeslot;
     });
-
     setTimeslots(updatedTimeslots);
   };
 

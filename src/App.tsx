@@ -8,9 +8,9 @@ import { Workspace } from "./containers/Layouts/workspace";
 import Sidebar from "./containers/Components/Sidebar";
 import TimeSlot from "./containers/Layouts/TimeSlot";
 function App() {
+
   const loggedInUsername = BrowserStorageService.get("username");
   const loggedInUserRole = BrowserStorageService.get("role");
-  debugger;
   return (
     <div className="App">
       <Router>
