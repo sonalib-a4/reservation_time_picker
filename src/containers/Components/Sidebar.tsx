@@ -16,7 +16,6 @@ const Sidebar = () => {
   const [isSideBarOpen, setSideBarOpen] = useState(false);
   let navigate = useNavigate();
   let path: string;
-
   const closeDrawer = () => {
     setSideBarOpen(false);
   };
