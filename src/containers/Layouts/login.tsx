@@ -8,7 +8,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { BrowserStorageService } from "./services/browser_storage_service";
+import { BrowserStorageService } from "../../services/browser_storage_service";
 import { useState } from 'react';
 import * as yup from "yup";
 import { useForm , SubmitHandler} from 'react-hook-form';
@@ -74,9 +74,10 @@ export default function Login() {
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         const authDetails = mimicBackendSignInAPI(data.username, data.password);
         if (authDetails.statusCode === 200 ) {
-            BrowserStorageService.put(authDetails.userDetails?.username, authDetails.userDetails?.role);
+            BrowserStorageService.put("username", authDetails.userDetails?.username);
+            BrowserStorageService.put("role", authDetails.userDetails?.role);
             reset();
-            navigate("/sonali");
+            navigate("/");
         } else if (authDetails.statusCode === 401) {
             setLoginIssues([
             ...loginIssues,
