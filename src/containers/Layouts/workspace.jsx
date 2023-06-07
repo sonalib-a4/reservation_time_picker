@@ -4,8 +4,8 @@ import { TimePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { TextField, Grid, Button } from '@mui/material';
-
+import { TextField, Grid, Button, Paper, Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
 const MeetingForm = ({ onSubmit }) => {
   const [title, setTitle] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -29,45 +29,38 @@ const MeetingForm = ({ onSubmit }) => {
   return (
     <Grid
           container
-          spacing={3}
+          spacing={{ xs: 2, md: 3 }}
           style={{ paddingTop: "20px" }}
           justifyContent="center"
         >
       <form onSubmit={handleSubmit}>
-        <Grid container>
+        <Grid container spacing={2}> 
           <Grid item md={6}>
           <TextField
             label="Title"
             type="text"
             variant="outlined"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           /></Grid>
           <Grid item md={6}>
             <TextField
               label="Duration(in minutes)"
               type="number"
               variant="outlined"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
             /></Grid>
           </Grid>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={['TimePicker', 'TimePicker']}>
-            <Grid container>
-            <Grid item md={6}>
-              <TimePicker
-                label="Start Time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-              </Grid>
-              <Grid item md={6}>
-              <TimePicker
-                label="End Time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-              /></Grid>
-            </Grid>
-            </DemoContainer>
-          </LocalizationProvider>
-          <Grid container>
+          <Grid container spacing={2}>
+          <Grid item md={6}>
+          <TextField
+            label="Min Capacity"
+            type="number"
+            variant="outlined"
+            value={minCapacity}
+            onChange={(e) => setMinCapacity(e.target.value)}
+          /></Grid>
           <Grid item md={6}>
             <TextField
               label="Max Capacity"
@@ -77,15 +70,28 @@ const MeetingForm = ({ onSubmit }) => {
               onChange={(e) => setMaxCapacity(e.target.value)}
             />
           </Grid>
-          <Grid item md={6}>
-          <TextField
-            label="Min Capacity"
-            type="number"
-            variant="outlined"
-            value={minCapacity}
-            onChange={(e) => setMinCapacity(e.target.value)}
-          /></Grid>
+          
           </Grid>
+            <Grid container spacing={2}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['TimePicker', 'TimePicker']}>
+            <Grid item md={6}>
+              <TimePicker
+                label="Start Time"
+                value={startTime}
+                onChange={(newValue) => setStartTime(newValue)}
+              />
+              </Grid>
+              <Grid item md={6}>
+              <TimePicker
+                label="End Time"
+                value={endTime}
+                onChange={(newValue) => setEndTime(newValue)}
+              /></Grid>
+            </DemoContainer>
+          </LocalizationProvider>
+            </Grid>
+          
           <Grid item md={6}>
             <Button variant="contained" type="submit">Create Meeting</Button>
           </Grid>
@@ -95,25 +101,40 @@ const MeetingForm = ({ onSubmit }) => {
   );
 };
 
+
+
 const Timeslot = ({ timeslot, onBook }) => {
   const { startTime, endTime, capacity, booked } = timeslot;
-
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: booked ? '#8cdd8c' : '#e91e63',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: 'white',
+    cursor: booked ?  'auto' : 'pointer' 
+  }));
   return (
-    <div className={`timeslot ${booked ? 'booked' : ''}`} onClick={onBook}>
-      <span>{startTime}</span> - <span>{endTime}</span>
-      <span className="capacity">Capacity: {capacity}</span>
-      {booked && <span className="status">Booked</span>}
-    </div>
+    <Grid item xs={2} className={`timeslot ${booked ? 'booked' : ''}`} onClick={onBook}>
+      <Item disabled={booked ? true : false }><span>{startTime}</span> - <span>{endTime}</span>
+            <span>Capacity: {capacity} - </span>
+            
+      </Item>
+    </Grid>
+ 
   );
 };
 
+
+
 const TimeslotList = ({ timeslots, onBook }) => {
   return (
-    <div className="timeslot-list">
+    <Box sx={{ flexGrow: 1 }}>
+    <Grid container spacing={2} className='timeslot-list'>
       {timeslots.map((timeslot) => (
         <Timeslot key={timeslot.startTime} timeslot={timeslot} onBook={() => onBook(timeslot)} />
       ))}
-    </div>
+    </Grid>
+    </Box>
   );
 };
 
@@ -124,8 +145,8 @@ export function Workspace() {
   const handleMeetingSubmit = (meeting) => {
     const { startTime, endTime, duration, maxCapacity, minCapacity } = meeting;
 
-    const startTimeObj = new Date(`2000-01-01T${startTime}`);
-    const endTimeObj = new Date(`2000-01-01T${endTime}`);
+    const startTimeObj = new Date(`${startTime}`);
+    const endTimeObj = new Date(`${endTime}`);
     const durationInMinutes = parseInt(duration);
 
     const generatedTimeslots = [];
@@ -139,7 +160,8 @@ export function Workspace() {
         startTime: startTimeString,
         endTime: endTimeString,
         capacity: maxCapacity,
-        booked: false
+        booked: false,
+        bookedCount: 0
       };
 
       generatedTimeslots.push(timeslot);
@@ -150,16 +172,19 @@ export function Workspace() {
   };
 
   const handleTimeslotBook = (selectedTimeslot) => {
+    selectedTimeslot.bookedCount += 1
+    console.log("selectedTimeslot==", selectedTimeslot)
     const updatedTimeslots = timeslots.map((timeslot) => {
-      if (timeslot.startTime === selectedTimeslot.startTime && timeslot.endTime === selectedTimeslot.endTime) {
+      if (timeslot.startTime === selectedTimeslot.startTime && timeslot.endTime === selectedTimeslot.endTime && parseInt(timeslot.capacity) === selectedTimeslot.bookedCount) {
         return {
           ...timeslot,
           booked: true
         };
       }
+
       return timeslot;
     });
-
+    console.log("updatedTimeslots===", updatedTimeslots)
     setTimeslots(updatedTimeslots);
   };
 
