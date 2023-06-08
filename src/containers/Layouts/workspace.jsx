@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Grid } from '@mui/material';
+import { Grid } from "@mui/material";
 import "react-calendar/dist/Calendar.css";
 import { BrowserStorageService } from "../../services/browser_storage_service";
-import { MeetingForm } from '../Admin/MeetingForm';
-import { TimeslotList } from '../User/TimeslotList';
-import { isAdmin, adminTimeSlots, useAuth } from '../../services/useAuth';
+import { MeetingForm } from "../Admin/MeetingForm";
+import { TimeslotList } from "../User/TimeslotList";
+import { isAdmin, adminTimeSlots, useAuth } from "../../services/useAuth";
 import Sidebar from "../Components/Sidebar";
-
 
 export function Workspace() {
   const [meetings, setMeetings] = useState([]);
@@ -15,7 +14,7 @@ export function Workspace() {
 
   useEffect(() => {
     let date = new Date();
-    let storedTimeslots = adminTimeSlots[date.toLocaleDateString()] || []
+    let storedTimeslots = adminTimeSlots[date.toLocaleDateString()] || [];
     setTimeslots([...storedTimeslots]);
   }, []);
 
@@ -28,9 +27,8 @@ export function Workspace() {
 
     const generatedTimeslots = [];
     let dayToString = new Date(date);
-    adminTimeSlots[dayToString.toLocaleDateString()] = []
+    adminTimeSlots[dayToString.toLocaleDateString()] = [];
     while (startTimeObj < endTimeObj) {
-      
       const startTimeString = startTimeObj.toLocaleTimeString([], {
         hour: "numeric",
         minute: "2-digit",
@@ -46,9 +44,9 @@ export function Workspace() {
         endTime: endTimeString,
         capacity: maxCapacity,
         booked: false,
-        bookedCount: 0
+        bookedCount: 0,
       };
-      adminTimeSlots[dayToString.toLocaleDateString()].push(timeslot)
+      adminTimeSlots[dayToString.toLocaleDateString()].push(timeslot);
       generatedTimeslots.push(timeslot);
     }
 
@@ -59,10 +57,14 @@ export function Workspace() {
   };
 
   const handleTimeslotBook = () => {
-    let selectedTimeslot = {}
-    selectedTimeslot.bookedCount += 1
+    let selectedTimeslot = {};
+    selectedTimeslot.bookedCount += 1;
     const updatedTimeslots = timeslots.map((timeslot) => {
-      if (timeslot.startTime === selectedTimeslot.startTime && timeslot.endTime === selectedTimeslot.endTime && parseInt(timeslot.capacity) === selectedTimeslot.bookedCount) {
+      if (
+        timeslot.startTime === selectedTimeslot.startTime &&
+        timeslot.endTime === selectedTimeslot.endTime &&
+        parseInt(timeslot.capacity) === selectedTimeslot.bookedCount
+      ) {
         return {
           ...timeslot,
           booked: true,
@@ -76,42 +78,47 @@ export function Workspace() {
 
   return (
     <div>
-      { isLoggedIn && <Sidebar /> }
+      {isLoggedIn && <Sidebar />}
       <h2>Reservation Time Picker</h2>
-      <h4>{ isAdmin() ? 'Define Meetings' : 'Book a slot' }</h4>
+      <h4>{isAdmin() ? "Define Meetings" : "Book a slot"}</h4>
       <Grid
-      container
-      spacing={3}
-      style={{
-        paddingTop: "2%",
-        outline: "1px solid rgb(219, 219, 219)",
-        marginLeft: "20%",
-        marginRight: "20%",
-        marginTop: "3%",
-        width: "60%",
-        paddingLeft: "2%",
-      }}
-      justifyContent="center"
-    >
-      <MeetingForm onSubmit={handleMeetingSubmit} setTimeslots={setTimeslots}/>
-    </Grid>
-    <Grid
-      container
-      spacing={3}
-      style={{
-        paddingTop: "2%",
-        outline: "1px solid rgb(219, 219, 219)",
-        marginLeft: "20%",
-        marginRight: "20%",
-        marginTop: "3%",
-        marginBottom: "3%",
-        width: "60%",
-        paddingLeft: "2%",
-      }}
-      justifyContent="center"
-    >
-      <TimeslotList timeslots={timeslots} onBook={handleTimeslotBook} isUser={!isAdmin()}/>
-    </Grid>
+        container
+        spacing={3}
+        style={{
+          paddingTop: "1%",
+          outline: "1px solid rgb(219, 219, 219)",
+          marginLeft: "20%",
+          marginRight: "20%",
+          marginTop: "3%",
+          width: "60%",
+          paddingLeft: "2%",
+          paddingRight: "2%",
+          paddingBottom: "1%",
+        }}
+        justifyContent="center"
+      >
+        <MeetingForm
+          onSubmit={handleMeetingSubmit}
+          setTimeslots={setTimeslots}
+        />
+      </Grid>
+      <Grid
+        container
+        sx={{
+          outline: "1px solid rgb(219, 219, 219)",
+          marginLeft: "20%",
+          marginTop: "3%",
+          marginBottom: "3%",
+          padding: "1%",
+          width: "60%",
+        }}
+      >
+        <TimeslotList
+          timeslots={timeslots}
+          onBook={handleTimeslotBook}
+          isUser={!isAdmin()}
+        />
+      </Grid>
     </div>
   );
 }

@@ -1,15 +1,10 @@
-import {
-  Box,
-  Button,
-  Drawer,
-  IconButton,
-} from "@mui/material";
+import { Box, Button, Drawer, IconButton } from "@mui/material";
 import React, { useState } from "react";
 import { BiMenu } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { isAdmin } from "../../services/useAuth";
-import Avatar from '@mui/material/Avatar';
-import { BrowserStorageService } from '../../services/browser_storage_service'
+import Avatar from "@mui/material/Avatar";
+import { BrowserStorageService } from "../../services/browser_storage_service";
 
 const Sidebar = () => {
   const [isSideBarOpen, setSideBarOpen] = useState(false);
@@ -34,17 +29,19 @@ const Sidebar = () => {
     // on logout, set username and role to null
     BrowserStorageService.put("username", null);
     BrowserStorageService.put("role", null);
-    navigate("/", { replace: true});
+    navigate("/", { replace: true });
     closeDrawer();
-  }
+  };
 
   return (
     <Box sx={{ alignItems: "start" }}>
       <IconButton
         sx={{
           color: "black",
-          alignItems: "start",
-          justifyContent: "start",
+          position: "absolute",
+          left: 0,
+          marginLeft: "2%",
+          margintop: "-10%",
         }}
         size="large"
         edge="start"
@@ -59,28 +56,22 @@ const Sidebar = () => {
         open={isSideBarOpen}
         onClose={() => setSideBarOpen(false)}
       >
-
         <Box width="330px" padding={2} />
-        <div>
-        
-        </div>
-        { isAdmin() && 
-        <>
-          <Avatar>
-            A
-          </Avatar>
-          <Button
-            sx={{ marginLeft: "9%", marginRight: "9%" }}
-            variant="contained"
-            component="button"
-            onClick={() => routeChange("slot")}
-          >
-            Create Slot
-          </Button> 
+        <div></div>
+        {isAdmin() && (
+          <>
+            <Avatar>A</Avatar>
+            <Button
+              sx={{ marginLeft: "9%", marginRight: "9%" }}
+              variant="contained"
+              component="button"
+              onClick={() => routeChange("slot")}
+            >
+              Create Slot
+            </Button>
           </>
-        }
-        {
-          isUser && 
+        )}
+        {isUser && (
           <Button
             sx={{ marginLeft: "9%", marginRight: "9%", marginTop: "5%" }}
             variant="contained"
@@ -89,10 +80,14 @@ const Sidebar = () => {
           >
             Timeslots List
           </Button>
-        }
+        )}
 
         <Button
-          sx={{ marginLeft: "10%", marginTop: "130%", fontSize: "22px" }}
+          sx={{
+            marginTop: "130%",
+            marginLeft: "9%",
+            marginRight: "9%",
+          }}
           variant="contained"
           component="button"
           onClick={() => logout()}
