@@ -11,14 +11,15 @@ function App() {
 
   const loggedInUsername = BrowserStorageService.get("username");
   const loggedInUserRole = BrowserStorageService.get("role");
+  
   return (
     <div className="App">
       <Router>
-        <Sidebar></Sidebar>
+        { loggedInUsername && <Sidebar></Sidebar> }
         <Routes>
           <Route
             path="/"
-            element={loggedInUsername === "admin" ? <Workspace /> : <Login />}
+            element={ (loggedInUsername && loggedInUsername != "") ? <Workspace /> : <Login />}
           />
           <Route path="/timeslot" element={<TimeSlot />} />
         </Routes>

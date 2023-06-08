@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { TimePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -8,192 +8,35 @@ import { TextField, Grid, Button, Paper, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-
-
-const MeetingForm = ({ onSubmit }) => {
-  const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [duration, setDuration] = useState("");
-  const [maxCapacity, setMaxCapacity] = useState("");
-  const [minCapacity, setMinCapacity] = useState("1");
-  const [date, setDate] = useState(new Date());
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    onSubmit({
-      title,
-      startTime,
-      endTime,
-      duration,
-      maxCapacity,
-      minCapacity,
-      date,
-    });
-  };
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-    console.log("title:", e.target.value);
-  };
-  const handleDurationChange = (e) => {
-    setDuration(e.target.value);
-    console.log("title:", e.target.value);
-  };
-  return (
-    <Grid
-      container
-      spacing={3}
-      style={{
-        paddingTop: "2%",
-        outline: "1px solid rgb(219, 219, 219)",
-        marginLeft: "20%",
-        marginRight: "20%",
-        marginTop: "3%",
-        width: "60%",
-        paddingLeft: "2%",
-      }}
-      justifyContent="center"
-    >
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}> 
-          <Grid item md={6}>
-            <Calendar
-              onChange={(newValue) => {
-                setDate(newValue);
-              }}
-              value={date}
-            />
-          </Grid>
-          <Grid item md={6}>
-            <Grid container>
-              <Grid item md={6} sx={{ marginRight: "1%", marginTop: "2%" }}>
-                <TextField
-                  value={title}
-                  label="Title"
-                  type="text"
-                  variant="outlined"
-                  onChange={(e) => handleTitleChange(e)}
-                />
-              </Grid>
-              <Grid item md={6} sx={{ marginRight: "1%", marginTop: "2%" }}>
-                <TextField
-                  label="Duration(in minutes)"
-                  type="number"
-                  variant="outlined"
-                  value={duration}
-                  onChange={handleDurationChange}
-                />
-              </Grid>
-            </Grid>
-
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["TimePicker", "TimePicker"]}>
-                <Grid
-                  container
-                  sx={{
-                    width: "auto",
-                  }}
-                >
-                  <Grid
-                    item
-                    md={6}
-                    sx={{
-                      marginTop: "2%",
-                      marginRight: "20px",
-                    }}
-                  >
-                    <TimePicker
-                      label="Start Time"
-                      value={startTime}
-                      onChange={(newValue) => setStartTime(newValue)}
-                    />
-                  </Grid>
-                  <Grid item md={6} sx={{ marginTop: "2%" }}>
-                    <TimePicker
-                      label="End Time"
-                      value={endTime}
-                      onChange={(newValue) => setEndTime(newValue)}
-                    />
-                  </Grid>
-                </Grid>
-              </DemoContainer>
-            </LocalizationProvider>
-            <Grid container>
-              <Grid item md={6} sx={{ marginRight: "1%", marginTop: "2%" }}>
-                <TextField
-                  label="Max Capacity"
-                  type="number"
-                  variant="outlined"
-                  value={maxCapacity}
-                  onChange={(e) => setMaxCapacity(e.target.value)}
-                />
-              </Grid>
-            </Grid>
-            <Grid item md={6} sx={{ marginTop: "2%", paddingBottom: "2%" }}>
-              <Button variant="contained" type="submit">
-                Create Meeting
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
-      </form>
-    </Grid>
-  );
-};
-
-
-
-const Timeslot = ({ timeslot, onBook }) => {
-  const { startTime, endTime, capacity, booked } = timeslot;
-  const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: booked ? '#8cdd8c' : '#e91e63',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: 'white',
-    cursor: booked ?  'auto' : 'pointer' 
-  }));
-  return (
-    <Grid item xs={2} className={`timeslot ${booked ? 'booked' : ''}`} onClick={onBook}>
-      <Item disabled={booked ? true : false }><span>{startTime}</span> - <span>{endTime}</span>
-            <span>Capacity: {capacity} - </span>
-      </Item>
-    </Grid>
-  );
-};
-
-
-
-const TimeslotList = ({ timeslots, onBook }) => {
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2} className='timeslot-list'>
-        {timeslots.map((timeslot) => (
-          <Timeslot
-            key={timeslot.startTime}
-            timeslot={timeslot}
-            onBook={() => onBook(timeslot)}
-          />
-        ))}
-      </Grid>
-    </Box>
-  );
-};
+import { BrowserStorageService } from "../../services/browser_storage_service";
+import { MeetingForm } from '../Admin/MeetingForm';
+import { TimeslotList } from '../User/TimeslotList';
 
 export function Workspace() {
   const [meetings, setMeetings] = useState([]);
   const [timeslots, setTimeslots] = useState([]);
+  let adminTimeSlots = BrowserStorageService.get('adminTimeSlots') || {};
+  const isAdmin = BrowserStorageService.get('role') === 'admin';
+  
+  useEffect(() => {
+    let date = new Date();
+    let storedTimeslots = adminTimeSlots[date.toLocaleDateString()] || []
+    setTimeslots([...storedTimeslots]);
+    
+  }, []);
 
   const handleMeetingSubmit = (meeting) => {
-    const { startTime, endTime, duration, maxCapacity, minCapacity } = meeting;
+    const { startTime, endTime, duration, maxCapacity, date } = meeting;
 
     const startTimeObj = new Date(`${startTime}`);
     const endTimeObj = new Date(`${endTime}`);
     const durationInMinutes = parseInt(duration);
 
     const generatedTimeslots = [];
-
+    let dayToString = new Date(date);
+    adminTimeSlots[dayToString.toLocaleDateString()] = []
     while (startTimeObj < endTimeObj) {
+      
       const startTimeString = startTimeObj.toLocaleTimeString([], {
         hour: "numeric",
         minute: "2-digit",
@@ -211,17 +54,18 @@ export function Workspace() {
         booked: false,
         bookedCount: 0
       };
-
+      adminTimeSlots[dayToString.toLocaleDateString()].push(timeslot)
       generatedTimeslots.push(timeslot);
     }
 
     setMeetings([...meetings, meeting]);
+    BrowserStorageService.put("adminTimeSlots", adminTimeSlots);
     setTimeslots(generatedTimeslots);
   };
 
-  const handleTimeslotBook = (selectedTimeslot) => {
+  const handleTimeslotBook = () => {
+    let selectedTimeslot = {}
     selectedTimeslot.bookedCount += 1
-    console.log("selectedTimeslot==", selectedTimeslot)
     const updatedTimeslots = timeslots.map((timeslot) => {
       if (timeslot.startTime === selectedTimeslot.startTime && timeslot.endTime === selectedTimeslot.endTime && parseInt(timeslot.capacity) === selectedTimeslot.bookedCount) {
         return {
@@ -238,8 +82,40 @@ export function Workspace() {
   return (
     <div>
       <h2>Reservation Time Picker</h2>
+      <h4>{ isAdmin ? 'Define Meetings' : 'Book a slot' }</h4>
+      <Grid
+      container
+      spacing={3}
+      style={{
+        paddingTop: "2%",
+        outline: "1px solid rgb(219, 219, 219)",
+        marginLeft: "20%",
+        marginRight: "20%",
+        marginTop: "3%",
+        width: "60%",
+        paddingLeft: "2%",
+      }}
+      justifyContent="center"
+    >
       <MeetingForm onSubmit={handleMeetingSubmit} />
-      <TimeslotList timeslots={timeslots} onBook={handleTimeslotBook} />
+    </Grid>
+    <Grid
+      container
+      spacing={3}
+      style={{
+        paddingTop: "2%",
+        outline: "1px solid rgb(219, 219, 219)",
+        marginLeft: "20%",
+        marginRight: "20%",
+        marginTop: "3%",
+        marginBottom: "3%",
+        width: "60%",
+        paddingLeft: "2%",
+      }}
+      justifyContent="center"
+    >
+      <TimeslotList timeslots={timeslots} onBook={handleTimeslotBook} isUser={!isAdmin}/>
+    </Grid>
     </div>
   );
 }
