@@ -39,17 +39,17 @@ function mimicBackendSignInAPI(username: string, password: string) {
       };
     } else if (username === "user1" && password === "user1") {
       return {
-        userDetails: { username, role: "customer" },
+        userDetails: { username, role: "user" },
         statusCode: 200,
       };
-    } else if (username === "user1" && password === "user1") {
+    } else if (username === "user3" && password === "user3") {
         return {
-        userDetails: { username, role: "customer" },
+        userDetails: { username, role: "user" },
         statusCode: 200,
         };
     } else if (username === "user2" && password === "user2") {
         return {
-        userDetails: { username, role: "customer" },
+        userDetails: { username, role: "user" },
         statusCode: 200,
         };
     } else {
@@ -76,7 +76,6 @@ export default function Login() {
         if (authDetails.statusCode === 200 ) {
             BrowserStorageService.put("username", authDetails.userDetails?.username);
             BrowserStorageService.put("role", authDetails.userDetails?.role);
-            reset();
             navigate("/");
         } else if (authDetails.statusCode === 401) {
             setLoginIssues([
