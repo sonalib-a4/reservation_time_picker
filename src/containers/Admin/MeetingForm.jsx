@@ -28,6 +28,7 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
     });
   };
 
+  const currentDate = new Date();
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
@@ -45,7 +46,11 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
     <form onSubmit={handleSubmit}>
       <Grid container spacing={2}>
         <Grid item md={isAdmin() ? 6 : 12}>
-          <Calendar onChange={(e) => onDateChange(e)} value={date} />
+          <Calendar
+            onChange={(e) => onDateChange(e)}
+            value={date}
+            minDate={currentDate}
+          />
         </Grid>
         {isAdmin() && (
           <Grid item md={6}>
@@ -84,6 +89,7 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
                     <TimePicker
                       label="End Time"
                       value={endTime}
+                      minTime={startTime}
                       onChange={(newValue) => setEndTime(newValue)}
                     />
                   </Grid>
