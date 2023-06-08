@@ -76,7 +76,6 @@ export default function Login() {
         if (authDetails.statusCode === 200 ) {
             BrowserStorageService.put("username", authDetails.userDetails?.username);
             BrowserStorageService.put("role", authDetails.userDetails?.role);
-            reset();
             navigate("/");
         } else if (authDetails.statusCode === 401) {
             setLoginIssues([

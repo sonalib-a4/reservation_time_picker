@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import dayjs, { Dayjs } from "dayjs";
-import { TimePicker } from "@mui/x-date-pickers";
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { TextField, Grid, Button, Paper, Box } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import Calendar from "react-calendar";
+import { Grid } from '@mui/material';
 import "react-calendar/dist/Calendar.css";
 import { BrowserStorageService } from "../../services/browser_storage_service";
 import { MeetingForm } from '../Admin/MeetingForm';
@@ -22,7 +15,6 @@ export function Workspace() {
     let date = new Date();
     let storedTimeslots = adminTimeSlots[date.toLocaleDateString()] || []
     setTimeslots([...storedTimeslots]);
-    
   }, []);
 
   const handleMeetingSubmit = (meeting) => {
@@ -97,7 +89,7 @@ export function Workspace() {
       }}
       justifyContent="center"
     >
-      <MeetingForm onSubmit={handleMeetingSubmit} />
+      <MeetingForm onSubmit={handleMeetingSubmit} isAdmin={isAdmin} setTimeslots={setTimeslots}/>
     </Grid>
     <Grid
       container
