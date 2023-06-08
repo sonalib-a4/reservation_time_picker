@@ -3,33 +3,26 @@ import {
   Button,
   Drawer,
   IconButton,
-  Link,
-  Typography,
 } from "@mui/material";
 import React, { useState } from "react";
 import { BiMenu } from "react-icons/bi";
-import Workspace from "../Layouts/workspace";
-import TimeSlot from "../Layouts/TimeSlot";
 import { useNavigate } from "react-router-dom";
-import { BrowserStorageService } from "../../services/browser_storage_service";
+import { isAdmin } from "../../services/useAuth";
 import Avatar from '@mui/material/Avatar';
-
+import { BrowserStorageService } from '../../services/browser_storage_service'
 
 const Sidebar = () => {
   const [isSideBarOpen, setSideBarOpen] = useState(false);
   let navigate = useNavigate();
   let path: string;
-  const loggedInUsername = BrowserStorageService.get("username");
-  const loggedInUserRole = BrowserStorageService.get("role");
-  const isAdmin = loggedInUsername && loggedInUserRole === 'admin';
-  const isUser = loggedInUsername && loggedInUserRole === 'user';
+  const isUser = !isAdmin();
   const closeDrawer = () => {
     setSideBarOpen(false);
   };
 
   const routeChange = (Routevalue: string) => {
     if (Routevalue === "slot") {
-      path = "/";
+      path = "/meetingBoard";
     } else {
       path = "/timeslot";
     }
@@ -38,9 +31,10 @@ const Sidebar = () => {
   };
 
   const logout = () => {
-    BrowserStorageService.put("username", "");
-    BrowserStorageService.put("role", "");
-    navigate("/");
+    // on logout, set username and role to null
+    BrowserStorageService.put("username", null);
+    BrowserStorageService.put("role", null);
+    navigate("/", { replace: true});
     closeDrawer();
   }
 
@@ -70,7 +64,7 @@ const Sidebar = () => {
         <div>
         
         </div>
-        { isAdmin && 
+        { isAdmin() && 
         <>
           <Avatar>
             A
