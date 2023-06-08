@@ -6,17 +6,16 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TextField, Grid, Button } from '@mui/material';
 import React, { useState } from "react";
 import Calendar from "react-calendar";
-import { BrowserStorageService } from "../../services/browser_storage_service";
+import { adminTimeSlots, isAdmin } from "../../services/useAuth";
 
 
-export function MeetingForm({ onSubmit, isAdmin, setTimeslots }) {
+export function MeetingForm({ onSubmit, setTimeslots }) {
     const [title, setTitle] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
     const [duration, setDuration] = useState("");
     const [maxCapacity, setMaxCapacity] = useState("");
     const [date, setDate] = useState(new Date());
-    let adminTimeSlots = BrowserStorageService.get('adminTimeSlots') || {};
 
     const handleSubmit = (event) => {
       event.preventDefault();
@@ -52,7 +51,7 @@ export function MeetingForm({ onSubmit, isAdmin, setTimeslots }) {
                 value={date}
               />
             </Grid>
-            { isAdmin && 
+            { isAdmin() && 
               <Grid item md={6}>
                 <Grid container>
                   <Grid item md={6} sx={{ marginRight: "1%", marginTop: "2%" }}>

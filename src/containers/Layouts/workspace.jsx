@@ -4,13 +4,15 @@ import "react-calendar/dist/Calendar.css";
 import { BrowserStorageService } from "../../services/browser_storage_service";
 import { MeetingForm } from '../Admin/MeetingForm';
 import { TimeslotList } from '../User/TimeslotList';
+import { isAdmin, adminTimeSlots, useAuth } from '../../services/useAuth';
+import Sidebar from "../Components/Sidebar";
+
 
 export function Workspace() {
   const [meetings, setMeetings] = useState([]);
   const [timeslots, setTimeslots] = useState([]);
-  let adminTimeSlots = BrowserStorageService.get('adminTimeSlots') || {};
-  const isAdmin = BrowserStorageService.get('role') === 'admin';
-  
+  const isLoggedIn = useAuth();
+
   useEffect(() => {
     let date = new Date();
     let storedTimeslots = adminTimeSlots[date.toLocaleDateString()] || []
@@ -51,6 +53,7 @@ export function Workspace() {
     }
 
     setMeetings([...meetings, meeting]);
+    // set admintime slots date wise in local storage so that we can use it while showing timeslots at user end
     BrowserStorageService.put("adminTimeSlots", adminTimeSlots);
     setTimeslots(generatedTimeslots);
   };
@@ -73,8 +76,9 @@ export function Workspace() {
 
   return (
     <div>
+      { isLoggedIn && <Sidebar /> }
       <h2>Reservation Time Picker</h2>
-      <h4>{ isAdmin ? 'Define Meetings' : 'Book a slot' }</h4>
+      <h4>{ isAdmin() ? 'Define Meetings' : 'Book a slot' }</h4>
       <Grid
       container
       spacing={3}
@@ -89,7 +93,7 @@ export function Workspace() {
       }}
       justifyContent="center"
     >
-      <MeetingForm onSubmit={handleMeetingSubmit} isAdmin={isAdmin} setTimeslots={setTimeslots}/>
+      <MeetingForm onSubmit={handleMeetingSubmit} setTimeslots={setTimeslots}/>
     </Grid>
     <Grid
       container
@@ -106,7 +110,7 @@ export function Workspace() {
       }}
       justifyContent="center"
     >
-      <TimeslotList timeslots={timeslots} onBook={handleTimeslotBook} isUser={!isAdmin}/>
+      <TimeslotList timeslots={timeslots} onBook={handleTimeslotBook} isUser={!isAdmin()}/>
     </Grid>
     </div>
   );
