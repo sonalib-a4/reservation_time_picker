@@ -4,13 +4,13 @@ import "react-calendar/dist/Calendar.css";
 import { BrowserStorageService } from "../../services/browser_storage_service";
 import { MeetingForm } from "../Admin/MeetingForm";
 import { TimeslotList } from "../User/TimeslotList";
-import { Typography } from "@material-ui/core";
+import { isAdmin, adminTimeSlots, useAuth } from "../../services/useAuth";
+import Sidebar from "../Components/Sidebar";
 
 export function Workspace() {
   const [meetings, setMeetings] = useState([]);
   const [timeslots, setTimeslots] = useState([]);
-  let adminTimeSlots = BrowserStorageService.get("adminTimeSlots") || {};
-  const isAdmin = BrowserStorageService.get("role") === "admin";
+  const isLoggedIn = useAuth();
 
   useEffect(() => {
     let date = new Date();
@@ -51,6 +51,7 @@ export function Workspace() {
     }
 
     setMeetings([...meetings, meeting]);
+    // set admintime slots date wise in local storage so that we can use it while showing timeslots at user end
     BrowserStorageService.put("adminTimeSlots", adminTimeSlots);
     setTimeslots(generatedTimeslots);
   };
@@ -77,13 +78,14 @@ export function Workspace() {
 
   return (
     <div>
+      {isLoggedIn && <Sidebar />}
       <h2>Reservation Time Picker</h2>
-      <h4>{isAdmin ? "Define Meetings" : "Book a slot"}</h4>
+      <h4>{isAdmin() ? "Define Meetings" : "Book a slot"}</h4>
       <Grid
         container
         spacing={3}
         style={{
-          paddingTop: "2%",
+          paddingTop: "1%",
           outline: "1px solid rgb(219, 219, 219)",
           marginLeft: "20%",
           marginRight: "20%",
@@ -91,12 +93,12 @@ export function Workspace() {
           width: "60%",
           paddingLeft: "2%",
           paddingRight: "2%",
+          paddingBottom: "1%",
         }}
         justifyContent="center"
       >
         <MeetingForm
           onSubmit={handleMeetingSubmit}
-          isAdmin={isAdmin}
           setTimeslots={setTimeslots}
         />
       </Grid>
@@ -114,7 +116,7 @@ export function Workspace() {
         <TimeslotList
           timeslots={timeslots}
           onBook={handleTimeslotBook}
-          isUser={!isAdmin}
+          isUser={!isAdmin()}
         />
       </Grid>
     </div>

@@ -30,31 +30,18 @@ type Inputs = {
 const defaultTheme = createTheme();
 
 function mimicBackendSignInAPI(username: string, password: string) {
-    let jwt: string = "";
-    console.log("up", username, password);
     if (username === "admin" && password === "admin") {
       return {
         userDetails: { username, role: "admin" },
         statusCode: 200,
       };
-    } else if (username === "user1" && password === "user1") {
+    } else if (['user1', 'user2', 'user3', 'user4', 'user5'].includes(username) && password === "user") {
       return {
         userDetails: { username, role: "user" },
         statusCode: 200,
       };
-    } else if (username === "user3" && password === "user3") {
-        return {
-        userDetails: { username, role: "user" },
-        statusCode: 200,
-        };
-    } else if (username === "user2" && password === "user2") {
-        return {
-        userDetails: { username, role: "user" },
-        statusCode: 200,
-        };
     } else {
       return {
-        auth_token: jwt,
         userDetails: { username, role: "admin" },
         statusCode: 401,
       };
@@ -74,9 +61,10 @@ export default function Login() {
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         const authDetails = mimicBackendSignInAPI(data.username, data.password);
         if (authDetails.statusCode === 200 ) {
+          //  set username and role to localstorage
             BrowserStorageService.put("username", authDetails.userDetails?.username);
             BrowserStorageService.put("role", authDetails.userDetails?.role);
-            navigate("/");
+            navigate("/meetingBoard", { replace: true });
         } else if (authDetails.statusCode === 401) {
             setLoginIssues([
             ...loginIssues,

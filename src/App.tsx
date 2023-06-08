@@ -1,30 +1,17 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import Login from "./containers/Layouts/login";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { BrowserStorageService } from "./services/browser_storage_service";
 import { Workspace } from "./containers/Layouts/workspace";
-import Sidebar from "./containers/Components/Sidebar";
+import { useAuth } from "./services/useAuth";
 function App() {
-  const loggedInUsername = BrowserStorageService.get("username");
-  const loggedInUserRole = BrowserStorageService.get("role");
-
+  const isLoggedIn = useAuth();
   return (
     <div className="App">
       <Router>
-        {loggedInUsername && <Sidebar></Sidebar>}
         <Routes>
-          <Route
-            path="/"
-            element={
-              loggedInUsername && loggedInUsername != "" ? (
-                <Workspace />
-              ) : (
-                <Login />
-              )
-            }
-          />
+          <Route path="/" element={<Login />} />
+          <Route path="/meetingBoard" element={isLoggedIn && <Workspace />} />
         </Routes>
       </Router>
     </div>
