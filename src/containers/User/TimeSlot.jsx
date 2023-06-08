@@ -1,12 +1,12 @@
 import React from "react";
-import { Grid, Paper } from "@mui/material";
+import { Grid, Paper, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import "react-calendar/dist/Calendar.css";
 
 export function TimeSlot({ timeslot, onBook }) {
   const { startTime, endTime, capacity, booked } = timeslot;
   const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: booked ? "#8cdd8c" : "#e91e63",
+    backgroundColor: booked ? "#e91e63" : "#8cdd8c",
     ...theme.typography.body2,
     padding: theme.spacing(1),
     textAlign: "center",
@@ -18,12 +18,14 @@ export function TimeSlot({ timeslot, onBook }) {
       item
       xs={5}
       className={`timeslot ${booked ? "booked" : ""}`}
-      onClick={onBook}
     >
-      <Item disabled={booked ? true : false}>
-        <span>{startTime}</span> - <span>{endTime}</span>
-        <span>Capacity: {capacity} - </span>
-      </Item>
+        <Button  disabled={timeslot.disabled} onClick={onBook} variant="contained" sx={{ backgroundColor: booked ? "#e91e63" : "#8cdd8c",
+                textAlign: "center",
+                color: "white",
+                cursor: booked ? "auto" : "pointer",
+                width: "150px"}}>
+          <span>{startTime}</span> - <span>{endTime} </span>
+        </Button>
     </Grid>
   );
 }

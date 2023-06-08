@@ -26,6 +26,15 @@ export const isAdmin = () => {
     }
 }
 
-export const adminTimeSlots = () => {
+export const getCurrentUser = () => {
+    const username = BrowserStorageService.get('username');
+    if( !isEmpty(username)){
+        return username
+    }else{
+        return null
+    }
+}
+
+export const adminTimeSlotFunc = () => {
     return BrowserStorageService.get('adminTimeSlots') || {};
 }
