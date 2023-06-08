@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, Button, Box, Typography } from "@mui/material";
+import { Grid, Button, Typography} from "@mui/material";
 import "react-calendar/dist/Calendar.css";
 import { TimeSlot } from "./TimeSlot";
 import { isAdmin, getCurrentUser } from "../../services/useAuth";
@@ -8,6 +8,7 @@ export function TimeslotList({ timeslots, onBook }) {
   const isUser = !isAdmin();
   const canShowBookButton = isUser && timeslots.length > 0;
   const currentUser = getCurrentUser() 
+  const [ selectedSlot, setSelectedSlot] = useState()
 
   const getBookedSlot = () => {
     if(currentUser){
@@ -25,7 +26,7 @@ export function TimeslotList({ timeslots, onBook }) {
             <TimeSlot
               key={timeslot.startTime}
               timeslot={timeslot}
-              onBook={() => onBook(timeslot)}
+              onBook={() => setSelectedSlot(timeslot)}
             />
           ))}
         </Grid>
@@ -38,9 +39,14 @@ export function TimeslotList({ timeslots, onBook }) {
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-end",
+            float: "right"
           }}
         >
-          <Button variant="contained" onClick={onBook}>
+          { selectedSlot && <Typography>
+            You have booked your slot with Admin at {selectedSlot.startTime} to {selectedSlot.endTime}
+          </Typography>
+          }
+          <Button variant="contained" onClick={() => onBook(selectedSlot) }>
             Book Slot
           </Button>
         </Grid>

@@ -47,7 +47,8 @@ export function Workspace() {
         capacity: maxCapacity,
         booked: false,
         bookedCount: 0,
-        usernames: []
+        usernames: [],
+        disabled: false
       };
       adminTimeSlots[dayToString.toLocaleDateString()].push(timeslot);
       generatedTimeslots.push(timeslot);
@@ -61,8 +62,8 @@ export function Workspace() {
 
   const handleTimeslotBook = (selectedTimeslot) => {
     selectedTimeslot.bookedCount += 1;
-    alert(`You have booked your slot with Admin at ${selectedTimeslot.startTime} to ${selectedTimeslot.endTime}`)
     const updatedTimeslots = timeslots.map((timeslot) => {
+      timeslot.disabled = true;
       if (
         timeslot.startTime === selectedTimeslot.startTime &&
         timeslot.endTime === selectedTimeslot.endTime &&
@@ -71,58 +72,59 @@ export function Workspace() {
         timeslot.usernames.push(currentUser);
         return {
           ...timeslot,
-          booked: true
+          booked: true,
         };
       }
-
       return timeslot;
     });
     setTimeslots(updatedTimeslots);
   };
 
   return (
-    <div>
-      {isLoggedIn && <Sidebar />}
-      <h2>Reservation Time Picker</h2>
-      <h4>{isAdmin() ? "Define Meetings" : "Book a slot"}</h4>
-      <Grid
-        container
-        spacing={3}
-        style={{
-          paddingTop: "1%",
-          outline: "1px solid rgb(219, 219, 219)",
-          marginLeft: "20%",
-          marginRight: "20%",
-          marginTop: "3%",
-          width: "60%",
-          paddingLeft: "2%",
-          paddingRight: "2%",
-          paddingBottom: "1%",
-        }}
-        justifyContent="center"
-      >
-        <MeetingForm
-          onSubmit={handleMeetingSubmit}
-          setTimeslots={setTimeslots}
-        />
-      </Grid>
-      <Grid
-        container
-        sx={{
-          outline: "1px solid rgb(219, 219, 219)",
-          marginLeft: "20%",
-          marginTop: "3%",
-          marginBottom: "3%",
-          padding: "1%",
-          width: "60%",
-        }}
-      >
-        <TimeslotList
-          timeslots={timeslots}
-          onBook={handleTimeslotBook}
-        />
-      </Grid>
-    </div>
+    isLoggedIn ? 
+      (<div>
+        <Sidebar />
+        <h2>Reservation Time Picker</h2>
+        <h4>{isAdmin() ? "Define Meetings" : "Book a slot"}</h4>
+        <Grid
+          container
+          spacing={3}
+          style={{
+            paddingTop: "1%",
+            outline: "1px solid rgb(219, 219, 219)",
+            marginLeft: "20%",
+            marginRight: "20%",
+            marginTop: "3%",
+            width: "60%",
+            paddingLeft: "2%",
+            paddingRight: "2%",
+            paddingBottom: "1%",
+          }}
+          justifyContent="center"
+        >
+          <MeetingForm
+            onSubmit={handleMeetingSubmit}
+            setTimeslots={setTimeslots}
+          />
+        </Grid>
+        <Grid
+          container
+          sx={{
+            outline: "1px solid rgb(219, 219, 219)",
+            marginLeft: "20%",
+            marginTop: "3%",
+            marginBottom: "3%",
+            padding: "1%",
+            width: "60%",
+          }}
+        >
+          <TimeslotList
+            timeslots={timeslots}
+            onBook={handleTimeslotBook}
+          />
+        </Grid>
+      </div>)
+      : <div></div>
   );
 }
 

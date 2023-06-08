@@ -11,7 +11,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/meetingBoard" element={isLoggedIn && <Workspace />} />
+          <Route path="/meetingBoard" element={<Workspace />} />
         </Routes>
       </Router>
     </div>
