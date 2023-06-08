@@ -10,12 +10,17 @@ import { adminTimeSlots, isAdmin } from "../../services/useAuth";
 
 export function MeetingForm({ onSubmit, setTimeslots }) {
   const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
   const [duration, setDuration] = useState("");
   const [maxCapacity, setMaxCapacity] = useState("");
   const [date, setDate] = useState(new Date());
+  const [startTime, setStartTime] = useState(dayjs().format("HH:mm"));
+  const [endTime, setEndTime] = useState(dayjs().format("HH:mm"));
 
+  const handleEndTimeChange = (newValue) => {
+    if (dayjs(newValue).isAfter(dayjs(startTime))) {
+      setEndTime(newValue);
+    }
+  };
   const handleSubmit = (event) => {
     event.preventDefault();
     onSubmit({
@@ -29,6 +34,7 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
   };
 
   const currentDate = new Date();
+
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
@@ -81,16 +87,19 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
                   <Grid item md={6}>
                     <TimePicker
                       label="Start Time"
+                      ampm={false}
                       value={startTime}
                       onChange={(newValue) => setStartTime(newValue)}
+                      disablePast
                     />
                   </Grid>
                   <Grid item md={6}>
                     <TimePicker
+                      disablePast
                       label="End Time"
                       value={endTime}
-                      minTime={startTime}
-                      onChange={(newValue) => setEndTime(newValue)}
+                      ampm={false}
+                      onChange={handleEndTimeChange}
                     />
                   </Grid>
                 </Grid>
