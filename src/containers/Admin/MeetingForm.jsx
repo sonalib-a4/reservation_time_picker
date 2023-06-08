@@ -121,7 +121,13 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
               md={6}
               sx={{ marginTop: "4%", marginLeft: "28%", paddingBottom: "2%" }}
             >
-              <Button variant="contained" type="submit">
+              <Button
+                disabled={
+                  !title || !duration || !startTime || !endTime || !maxCapacity
+                }
+                variant="contained"
+                type="submit"
+              >
                 Create Slots
               </Button>
             </Grid>

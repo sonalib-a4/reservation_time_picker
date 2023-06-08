@@ -25,6 +25,11 @@ export function Workspace() {
     const endTimeObj = new Date(`${endTime}`);
     const durationInMinutes = parseInt(duration);
 
+    if (durationInMinutes > (endTimeObj - startTimeObj) / (1000 * 60)) {
+      alert("Duration can not be greater than selected time");
+      return;
+    }
+
     const generatedTimeslots = [];
     let dayToString = new Date(date);
     adminTimeSlots[dayToString.toLocaleDateString()] = [];
