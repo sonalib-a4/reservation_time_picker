@@ -6,7 +6,7 @@ import "react-calendar/dist/Calendar.css";
 export function TimeSlot({ timeslot, onBook }) {
   const { startTime, endTime, capacity, booked } = timeslot;
   const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: booked ? "#8cdd8c" : "#e91e63",
+    backgroundColor: booked ? "#e91e63" : "#8cdd8c",
     ...theme.typography.body2,
     padding: theme.spacing(1),
     textAlign: "center",
@@ -21,8 +21,8 @@ export function TimeSlot({ timeslot, onBook }) {
       onClick={onBook}
     >
       <Item disabled={booked ? true : false}>
-        <span>{startTime}</span> - <span>{endTime}</span>
-        <span>Capacity: {capacity} - </span>
+        <span>{startTime}</span> - <span>{endTime} | </span>
+        <span>Capacity- {capacity} </span>
       </Item>
     </Grid>
   );

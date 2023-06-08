@@ -4,13 +4,15 @@ import "react-calendar/dist/Calendar.css";
 import { BrowserStorageService } from "../../services/browser_storage_service";
 import { MeetingForm } from "../Admin/MeetingForm";
 import { TimeslotList } from "../User/TimeslotList";
-import { isAdmin, adminTimeSlots, useAuth } from "../../services/useAuth";
+import { isAdmin, adminTimeSlotFunc, useAuth, getCurrentUser } from "../../services/useAuth";
 import Sidebar from "../Components/Sidebar";
 
 export function Workspace() {
   const [meetings, setMeetings] = useState([]);
   const [timeslots, setTimeslots] = useState([]);
   const isLoggedIn = useAuth();
+  const adminTimeSlots = adminTimeSlotFunc();
+  const currentUser = getCurrentUser() 
 
   useEffect(() => {
     let date = new Date();
@@ -45,6 +47,7 @@ export function Workspace() {
         capacity: maxCapacity,
         booked: false,
         bookedCount: 0,
+        usernames: []
       };
       adminTimeSlots[dayToString.toLocaleDateString()].push(timeslot);
       generatedTimeslots.push(timeslot);
@@ -56,18 +59,19 @@ export function Workspace() {
     setTimeslots(generatedTimeslots);
   };
 
-  const handleTimeslotBook = () => {
-    let selectedTimeslot = {};
+  const handleTimeslotBook = (selectedTimeslot) => {
     selectedTimeslot.bookedCount += 1;
+    alert(`You have booked your slot with Admin at ${selectedTimeslot.startTime} to ${selectedTimeslot.endTime}`)
     const updatedTimeslots = timeslots.map((timeslot) => {
       if (
         timeslot.startTime === selectedTimeslot.startTime &&
         timeslot.endTime === selectedTimeslot.endTime &&
         parseInt(timeslot.capacity) === selectedTimeslot.bookedCount
       ) {
+        timeslot.usernames.push(currentUser);
         return {
           ...timeslot,
-          booked: true,
+          booked: true
         };
       }
 
@@ -116,7 +120,6 @@ export function Workspace() {
         <TimeslotList
           timeslots={timeslots}
           onBook={handleTimeslotBook}
-          isUser={!isAdmin()}
         />
       </Grid>
     </div>

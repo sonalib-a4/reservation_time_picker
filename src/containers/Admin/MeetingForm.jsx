@@ -6,7 +6,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TextField, Grid, Button } from "@mui/material";
 import React, { useState } from "react";
 import Calendar from "react-calendar";
-import { adminTimeSlots, isAdmin } from "../../services/useAuth";
+import { adminTimeSlotFunc, isAdmin } from "../../services/useAuth";
 
 export function MeetingForm({ onSubmit, setTimeslots }) {
   const [title, setTitle] = useState("");
@@ -15,6 +15,8 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
   const [duration, setDuration] = useState("");
   const [maxCapacity, setMaxCapacity] = useState("");
   const [date, setDate] = useState(new Date());
+
+  const adminTimeSlots = adminTimeSlotFunc();
 
   const handleSubmit = (event) => {
     event.preventDefault();
