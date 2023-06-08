@@ -10,11 +10,12 @@ import { adminTimeSlotFunc, isAdmin } from "../../services/useAuth";
 
 export function MeetingForm({ onSubmit, setTimeslots }) {
   const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [startTime, setStartTime] = useState(dayjs().format("HH:mm"));
+  const [endTime, setEndTime] = useState(dayjs().format("HH:mm"));
   const [duration, setDuration] = useState("");
   const [maxCapacity, setMaxCapacity] = useState("");
   const [date, setDate] = useState(new Date());
+  const currentDate = new Date();
 
   const adminTimeSlots = adminTimeSlotFunc();
 
@@ -30,6 +31,12 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
     });
   };
 
+  const handleEndTimeChange = (newValue) => {
+    if (dayjs(newValue).isAfter(dayjs(startTime))) {
+      setEndTime(newValue);
+    }
+  };
+  
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
@@ -47,7 +54,11 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
     <form onSubmit={handleSubmit}>
       <Grid container spacing={2}>
         <Grid item md={isAdmin() ? 6 : 12}>
-          <Calendar onChange={(e) => onDateChange(e)} value={date} />
+          <Calendar
+            onChange={(e) => onDateChange(e)}
+            value={date}
+            minDate={currentDate}
+          />
         </Grid>
         {isAdmin() && (
           <Grid item md={6}>
@@ -78,15 +89,19 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
                   <Grid item md={6}>
                     <TimePicker
                       label="Start Time"
+                      ampm={false}
                       value={startTime}
                       onChange={(newValue) => setStartTime(newValue)}
+                      disablePast
                     />
                   </Grid>
                   <Grid item md={6}>
                     <TimePicker
+                      disablePast
                       label="End Time"
                       value={endTime}
-                      onChange={(newValue) => setEndTime(newValue)}
+                      ampm={false}
+                      onChange={handleEndTimeChange}
                     />
                   </Grid>
                 </Grid>
@@ -108,7 +123,13 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
               md={6}
               sx={{ marginTop: "4%", marginLeft: "28%", paddingBottom: "2%" }}
             >
-              <Button variant="contained" type="submit">
+              <Button
+                disabled={
+                  !title || !duration || !startTime || !endTime || !maxCapacity
+                }
+                variant="contained"
+                type="submit"
+              >
                 Create Slots
               </Button>
             </Grid>

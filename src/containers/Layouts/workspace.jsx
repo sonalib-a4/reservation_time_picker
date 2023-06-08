@@ -27,9 +27,15 @@ export function Workspace() {
     const endTimeObj = new Date(`${endTime}`);
     const durationInMinutes = parseInt(duration);
 
+    if (durationInMinutes > (endTimeObj - startTimeObj) / (1000 * 60)) {
+      alert("Duration can not be greater than selected time.");
+      return;
+    }
+
     const generatedTimeslots = [];
     let dayToString = new Date(date);
     adminTimeSlots[dayToString.toLocaleDateString()] = [];
+
     while (startTimeObj < endTimeObj) {
       const startTimeString = startTimeObj.toLocaleTimeString([], {
         hour: "numeric",
@@ -57,26 +63,29 @@ export function Workspace() {
     setMeetings([...meetings, meeting]);
     // set admintime slots date wise in local storage so that we can use it while showing timeslots at user end
     BrowserStorageService.put("adminTimeSlots", adminTimeSlots);
-    setTimeslots(generatedTimeslots);
+    
+    setTimeslots(adminTimeSlots[dayToString.toLocaleDateString()]);
   };
 
   const handleTimeslotBook = (selectedTimeslot) => {
     selectedTimeslot.bookedCount += 1;
     const updatedTimeslots = timeslots.map((timeslot) => {
-      timeslot.disabled = true;
+      timeslot.disabled = true;      
+      if(!timeslot.usernames.includes(currentUser))
+        timeslot.usernames.push(currentUser);
       if (
         timeslot.startTime === selectedTimeslot.startTime &&
         timeslot.endTime === selectedTimeslot.endTime &&
         parseInt(timeslot.capacity) === selectedTimeslot.bookedCount
-      ) {
-        timeslot.usernames.push(currentUser);
-        return {
-          ...timeslot,
-          booked: true,
-        };
-      }
-      return timeslot;
-    });
+        ) {
+          return {
+            ...timeslot,
+            booked: true,
+          };
+        }
+        return timeslot;
+      });
+      
     setTimeslots(updatedTimeslots);
   };
 
@@ -107,6 +116,7 @@ export function Workspace() {
             setTimeslots={setTimeslots}
           />
         </Grid>
+        {timeslots.length > 0 &&
         <Grid
           container
           sx={{
@@ -123,6 +133,7 @@ export function Workspace() {
             onBook={handleTimeslotBook}
           />
         </Grid>
+        }
       </div>)
       : <div></div>
   );
