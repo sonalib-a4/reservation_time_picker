@@ -9,15 +9,7 @@ export function TimeslotList({ timeslots, onBook }) {
   const canShowBookButton = isUser && timeslots.length > 0;
   const currentUser = getCurrentUser() 
   const [ selectedSlot, setSelectedSlot] = useState()
-
-  const getBookedSlot = () => {
-    if(currentUser){
-      timeslots.find(
-        (timeslot) => console.log(timeslot)
-      );
-    }
-  }
-  getBookedSlot()
+ 
   return (
     <Grid container spacing={1} className="timeslot-list">
       <Grid item md={6} xs={12} style={{ height: "200px", overflow: "auto" }}>
@@ -43,7 +35,7 @@ export function TimeslotList({ timeslots, onBook }) {
           }}
         >
           { selectedSlot && <Typography>
-            You have booked your slot with Admin at {selectedSlot.startTime} to {selectedSlot.endTime}
+            You have selected slot with Admin at {selectedSlot.startTime} to {selectedSlot.endTime}?
           </Typography>
           }
           <Button variant="contained" onClick={() => onBook(selectedSlot) }>
