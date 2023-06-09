@@ -13,12 +13,21 @@ export function Workspace() {
   const isLoggedIn = useAuth();
   const adminTimeSlots = adminTimeSlotFunc();
   const currentUser = getCurrentUser() 
+  const [selectedDate, setSelectedDate] = useState();
 
   useEffect(() => {
+    setSelectedDate(new Date());
     let date = new Date();
     let storedTimeslots = adminTimeSlots[date.toLocaleDateString()] || [];
     setTimeslots([...storedTimeslots]);
   }, []);
+
+  const convertTimeToString = (time) => {
+    return time.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
 
   const handleMeetingSubmit = (meeting) => {
     const { startTime, endTime, duration, maxCapacity, date } = meeting;
@@ -26,26 +35,34 @@ export function Workspace() {
     const startTimeObj = new Date(`${startTime}`);
     const endTimeObj = new Date(`${endTime}`);
     const durationInMinutes = parseInt(duration);
+    const validateStartTime = convertTimeToString(startTimeObj);
+    const generatedTimeslots = [];
+
+    let dayToString = new Date(date);
+    dayToString = dayToString.toLocaleDateString();
 
     if (durationInMinutes > (endTimeObj - startTimeObj) / (1000 * 60)) {
       alert("Duration can not be greater than selected time.");
       return;
+    }    
+    adminTimeSlots[dayToString] = adminTimeSlots[dayToString] || [];
+    
+    // check for duplicate slot generation
+    let canCreateSlot = true;
+    adminTimeSlots[dayToString].map((slot) => {
+      if(validateStartTime === slot.startTime){
+        canCreateSlot = false;
+      }
+    });
+    if(!canCreateSlot){
+      alert("You can not create duplicate slots");
+      return;
     }
-
-    const generatedTimeslots = [];
-    let dayToString = new Date(date);
-    adminTimeSlots[dayToString.toLocaleDateString()] = [];
-
+    
     while (startTimeObj < endTimeObj) {
-      const startTimeString = startTimeObj.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-      });
+      const startTimeString = convertTimeToString(startTimeObj)
       startTimeObj.setMinutes(startTimeObj.getMinutes() + durationInMinutes);
-      const endTimeString = startTimeObj.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-      });
+      const endTimeString = convertTimeToString(startTimeObj);
 
       const timeslot = {
         startTime: startTimeString,
@@ -56,27 +73,28 @@ export function Workspace() {
         usernames: [],
         disabled: false
       };
-      adminTimeSlots[dayToString.toLocaleDateString()].push(timeslot);
+      adminTimeSlots[dayToString].push(timeslot);
       generatedTimeslots.push(timeslot);
     }
-
     setMeetings([...meetings, meeting]);
     // set admintime slots date wise in local storage so that we can use it while showing timeslots at user end
     BrowserStorageService.put("adminTimeSlots", adminTimeSlots);
-    
-    setTimeslots(adminTimeSlots[dayToString.toLocaleDateString()]);
+
+    setTimeslots(adminTimeSlots[dayToString]);
   };
 
   const handleTimeslotBook = (selectedTimeslot) => {
     selectedTimeslot.bookedCount += 1;
+    
+    if(!selectedTimeslot.usernames.includes(currentUser))
+      selectedTimeslot.usernames.push(currentUser);
+
     const updatedTimeslots = timeslots.map((timeslot) => {
       timeslot.disabled = true;      
-      if(!timeslot.usernames.includes(currentUser))
-        timeslot.usernames.push(currentUser);
+      
       if (
         timeslot.startTime === selectedTimeslot.startTime &&
-        timeslot.endTime === selectedTimeslot.endTime &&
-        parseInt(timeslot.capacity) === selectedTimeslot.bookedCount
+        timeslot.endTime === selectedTimeslot.endTime
         ) {
           return {
             ...timeslot,
@@ -85,7 +103,10 @@ export function Workspace() {
         }
         return timeslot;
       });
-      
+
+    // TODO set selected date here to set updated timeslots in admintimeslots with date
+    adminTimeSlots[selectedDate?.toLocaleDateString()] = updatedTimeslots;
+    BrowserStorageService.put("adminTimeSlots", adminTimeSlots);
     setTimeslots(updatedTimeslots);
   };
 
@@ -114,6 +135,7 @@ export function Workspace() {
           <MeetingForm
             onSubmit={handleMeetingSubmit}
             setTimeslots={setTimeslots}
+            setSelectedDate={setSelectedDate}
           />
         </Grid>
         {timeslots.length > 0 &&
