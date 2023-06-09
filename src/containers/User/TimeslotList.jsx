@@ -12,8 +12,8 @@ export function TimeslotList({ timeslots, onBook }) {
  
   return (
     <Grid container spacing={1} className="timeslot-list">
-      <Grid item md={9} style={{ height: "200px", overflow: "auto" }}>
-        <Grid container spacing={1}>
+      <Grid item md={ canShowBookButton ? 9 : 12} style={{ height: "200px", overflow:"auto", paddingLeft: isUser ? "10px" : "50px" }}>
+        <Grid container spacing={2}>
           {timeslots.map((timeslot) => (
             <TimeSlot
               key={timeslot.startTime}

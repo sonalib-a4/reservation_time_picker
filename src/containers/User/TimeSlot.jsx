@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Paper, Button, Tooltip } from "@mui/material";
+import { Grid, Paper, Button, Tooltip, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import "react-calendar/dist/Calendar.css";
 import { isAdmin, getCurrentUser } from '../../services/useAuth';
@@ -13,6 +13,7 @@ export function TimeSlot({ timeslot, onBook }) {
     padding: theme.spacing(1),
     textAlign: "center",
     color: "white",
+    display: "grid",
     cursor: booked ? "auto" : "pointer",
     '&:hover': {
       backgroundColor: booked ? "#d54f4f" : "#8cdd8c",
@@ -26,13 +27,13 @@ export function TimeSlot({ timeslot, onBook }) {
   return (
     <Grid
       item
-      xs={5}
+      xs={3} 
       className={`timeslot ${booked ? "booked" : ""}`}
     >
         <Tooltip title={isAdmin() ? timeslot.usernames.join(' | ') : ''}>
           <Item disabled={booked} onClick={onBook} variant="contained" >
-            <h4>{startTime} - {endTime}</h4>
-            <h4>Capacity - {capacity} Max</h4>
+            <Typography variant="button" display="block">{startTime} - {endTime}</Typography>
+            <Typography variant="button" display="block">{capacity} Max</Typography>
           </Item>
         </Tooltip>
     </Grid>

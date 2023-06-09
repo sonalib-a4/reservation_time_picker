@@ -10,8 +10,8 @@ import { adminTimeSlotFunc, isAdmin } from "../../services/useAuth";
 
 export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
   const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState(dayjs().format("HH:mm"));
-  const [endTime, setEndTime] = useState(dayjs().format("HH:mm"));
+  const [startTime, setStartTime] = useState();
+  const [endTime, setEndTime] = useState();
   const [duration, setDuration] = useState("");
   const [maxCapacity, setMaxCapacity] = useState("");
   const [date, setDate] = useState(new Date());
@@ -42,6 +42,19 @@ export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
   };
   const handleDurationChange = (e) => {
     setDuration(e.target.value);
+  };
+
+  const isPastDate = (date) => {
+    const currentDate = new Date();
+    const selectedDate = new Date(date); //converting date into proper format
+
+    // Compare only the date portion (year, month, day)
+    const isPast =
+      selectedDate.getFullYear() === currentDate.getFullYear() &&
+      selectedDate.getMonth() === currentDate.getMonth() &&
+      selectedDate.getDate() === currentDate.getDate();
+
+    return isPast;
   };
 
   const onDateChange = (e) => {
@@ -83,7 +96,6 @@ export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
                 />
               </Grid>
             </Grid>
-
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={["TimePicker", "TimePicker"]}>
                 <Grid container spacing={2}>
@@ -93,12 +105,12 @@ export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
                       ampm={false}
                       value={startTime}
                       onChange={(newValue) => setStartTime(newValue)}
-                      disablePast
+                      disablePast={isPastDate(date)}
                     />
                   </Grid>
                   <Grid item md={6}>
                     <TimePicker
-                      disablePast
+                      disablePast={isPastDate(date)}
                       label="End Time"
                       value={endTime}
                       ampm={false}
@@ -122,7 +134,7 @@ export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
             <Grid
               item
               md={6}
-              sx={{ marginTop: "4%", marginLeft: "28%", paddingBottom: "2%" }}
+              sx={{ paddingTop: "52px", marginLeft: "28%" }}
             >
               <Button
                 disabled={
