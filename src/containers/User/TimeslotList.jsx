@@ -8,7 +8,7 @@ export function TimeslotList({ timeslots, onBook }) {
   const isUser = !isAdmin();
   const canShowBookButton = isUser && timeslots.length > 0;
   const currentUser = getCurrentUser() 
-  const [ selectedSlot, setSelectedSlot] = useState()
+  const [ selectedSlot, setSelectedSlot] = useState(null)
  
   return (
     <Grid container spacing={1} className="timeslot-list">

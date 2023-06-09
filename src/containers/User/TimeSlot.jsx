@@ -8,7 +8,7 @@ export function TimeSlot({ timeslot, onBook }) {
   const { startTime, endTime, capacity, booked, usernames, bookedCount } = timeslot;
   const currentUser = getCurrentUser() 
   const Item = styled(Button)(({ theme }) => ({
-    backgroundColor: booked ? "#d54f4f" : "#8cdd8c",
+    backgroundColor:  (timeslot.usernames.includes(currentUser) ? 'orange' : (booked ? "#d54f4f" : "#8cdd8c")),
     ...theme.typography.body2,
     padding: theme.spacing(1),
     textAlign: "center",
@@ -31,10 +31,12 @@ export function TimeSlot({ timeslot, onBook }) {
       className={`timeslot ${booked ? "booked" : ""}`}
     >
         <Tooltip title={isAdmin() ? timeslot.usernames.join(' | ') : ''}>
+          <span>
           <Item disabled={booked} onClick={onBook} variant="contained" >
             <Typography variant="button" display="block">{startTime} - {endTime}</Typography>
-            <Typography variant="button" display="block">{capacity} Max</Typography>
+            <Typography variant="button" display="block">Booked - {bookedCount}/{capacity}</Typography>
           </Item>
+          </span>
         </Tooltip>
     </Grid>
   );
