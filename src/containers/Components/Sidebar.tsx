@@ -59,17 +59,14 @@ const Sidebar = () => {
         <Box width="330px" padding={2} />
         <div></div>
         {isAdmin() && (
-          <>
-            <Avatar>A</Avatar>
-            <Button
-              sx={{ marginLeft: "9%", marginRight: "9%" }}
-              variant="contained"
-              component="button"
-              onClick={() => routeChange("slot")}
-            >
-              Create Slot
-            </Button>
-          </>
+          <Button
+            sx={{ marginLeft: "9%", marginRight: "9%" }}
+            variant="contained"
+            component="button"
+            onClick={() => routeChange("slot")}
+          >
+            Create Slot
+          </Button>
         )}
         {isUser && (
           <Button

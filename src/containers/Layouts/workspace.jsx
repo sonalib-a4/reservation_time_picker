@@ -84,6 +84,10 @@ export function Workspace() {
   };
 
   const handleTimeslotBook = (selectedTimeslot) => {
+    if(selectedTimeslot === null){
+      alert("Please select a slot first");
+      return
+    }
     selectedTimeslot.bookedCount += 1;
     
     if(!selectedTimeslot.usernames.includes(currentUser))
@@ -94,7 +98,8 @@ export function Workspace() {
       
       if (
         timeslot.startTime === selectedTimeslot.startTime &&
-        timeslot.endTime === selectedTimeslot.endTime
+        timeslot.endTime === selectedTimeslot.endTime && 
+        parseInt(timeslot.capacity) === selectedTimeslot.bookedCount
         ) {
           return {
             ...timeslot,
