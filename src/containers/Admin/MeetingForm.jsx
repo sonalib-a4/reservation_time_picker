@@ -29,9 +29,18 @@ export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
       maxCapacity,
       date,
     });
+    setTitle("");
+    setStartTime(null);
+    setEndTime(null);
+    setDuration("");
+    setMaxCapacity("");
   };
 
   const handleEndTimeChange = (newValue) => {
+    if(newValue - startTime <= 0){
+      alert("Please select end time greater than start time.");
+      return;
+    }
     if (dayjs(newValue).isAfter(dayjs(startTime))) {
       setEndTime(newValue);
     }
@@ -60,6 +69,11 @@ export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
   const onDateChange = (e) => {
     setDate(e);
     setSelectedDate(e);
+    setTitle("");
+    setStartTime(null);
+    setEndTime(null);
+    setDuration("");
+    setMaxCapacity("");
     let timeslotList = adminTimeSlots[e.toLocaleDateString()] || [];
     setTimeslots([...timeslotList]);
   };
@@ -138,7 +152,7 @@ export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
             >
               <Button
                 disabled={
-                  !title || !duration || !startTime || !endTime || !maxCapacity
+                  (!title || !duration || !startTime || !endTime || !maxCapacity)
                 }
                 variant="contained"
                 type="submit"
