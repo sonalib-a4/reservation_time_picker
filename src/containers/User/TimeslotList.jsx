@@ -12,8 +12,8 @@ export function TimeslotList({ timeslots, onBook }) {
  
   return (
     <Grid container spacing={1} className="timeslot-list">
-      <Grid item md={6} xs={12} style={{ height: "200px", overflow: "auto" }}>
-        <Grid container spacing={2}>
+      <Grid item md={9} style={{ height: "200px", overflow: "auto" }}>
+        <Grid container spacing={1}>
           {timeslots.map((timeslot) => (
             <TimeSlot
               key={timeslot.startTime}
@@ -26,7 +26,7 @@ export function TimeslotList({ timeslots, onBook }) {
       {canShowBookButton && (
         <Grid
           item
-          md={6}
+          md={3}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -35,7 +35,7 @@ export function TimeslotList({ timeslots, onBook }) {
           }}
         >
           { selectedSlot && <Typography>
-            You have selected slot with Admin at {selectedSlot.startTime} to {selectedSlot.endTime}?
+            You have selected slot with Admin at {selectedSlot.startTime} to {selectedSlot.endTime}
           </Typography>
           }
           <Button variant="contained" onClick={() => onBook(selectedSlot) }>
