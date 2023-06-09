@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import Calendar from "react-calendar";
 import { adminTimeSlotFunc, isAdmin } from "../../services/useAuth";
 
-export function MeetingForm({ onSubmit, setTimeslots }) {
+export function MeetingForm({ onSubmit, setTimeslots, setSelectedDate }) {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState(dayjs().format("HH:mm"));
   const [endTime, setEndTime] = useState(dayjs().format("HH:mm"));
@@ -46,6 +46,7 @@ export function MeetingForm({ onSubmit, setTimeslots }) {
 
   const onDateChange = (e) => {
     setDate(e);
+    setSelectedDate(e);
     let timeslotList = adminTimeSlots[e.toLocaleDateString()] || [];
     setTimeslots([...timeslotList]);
   };
